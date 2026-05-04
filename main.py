@@ -1,7 +1,7 @@
 """
 Terminal Financeiro — Bot Telegram para monitoramento financeiro em tempo real.
 
-Verso: 2.2.1 | Autor: Alyson | Licença: MIT
+Versão: 2.3.5 | Autor: Alyson | Licença: MIT
 Arquitetura: main.py (roteamento) → util.py (lógica) → API.py (conectividade)
 """
 
@@ -16,19 +16,20 @@ from dotenv import load_dotenv
 import telebot
 import requests
 import feedparser
-import API
+import apifinanceira
 import util
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from telebot import ExceptionHandler
 
-from API import buscar_preco_binance, buscar_preco_awesome
+from apifinanceira import buscar_preco_hgbrasil, buscar_preco_coingecko
 from util import FONTES_NOTICIAS, speak, formatar_variacao, TEXTO_AJUDA, carregar_alertas, salvar_memoria, carregar_preferencias, salvar_preferencias, compilar_jornal, compilar_radar, MANUAL_COMANDOS, buscar_preco_ativo
+from datetime import datetime, timezone, timedelta
 
 # ======================================
 #-------CONFIGURAÇÃO E SETUP--------
 # ======================================
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 CHAVE_API = os.getenv("CHAVE_API")
 
@@ -54,8 +55,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-VERSAO = "2.2.1"
-DATA_ATUALIZACAO = "09/04/2026"
+VERSAO = "2.3.5"
+DATA_ATUALIZACAO = "03/05/2026"
 LOCK_FILE = 'bot.lock'
 
 
@@ -69,17 +70,16 @@ def motor_de_alertas():
     tempo_decorrido = 0 
     
     while True:
-        time.sleep(60)
+        time.sleep(30)  
         tempo_decorrido += 1
         
         try:
-            from datetime import datetime, timezone, timedelta
             fuso_br = timezone(timedelta(hours=-3))
             agora = datetime.now(fuso_br)
             hora_atual_str = agora.strftime("%H:%M")
             data_atual_str = agora.strftime("%Y-%m-%d")
             
-            for chat_id, pref in preferencias_ativas.items():
+            for chat_id, pref in list(preferencias_ativas.items()):
                 if pref.get('jornal_ativo', False):
                     hora_alvo = pref.get('jornal_hora', '08:00')
                     ultimo_envio = pref.get('jornal_ultimo_envio', '')
@@ -92,8 +92,8 @@ def motor_de_alertas():
                         except Exception as e:
                             logger.error(f"Erro ao enviar Jornal para {chat_id}: {e}")
             
-            if tempo_decorrido >= 90:
-                for chat_id, pref in preferencias_ativas.items():
+            if tempo_decorrido >= 90:  # 90 ciclos * 30s = 45 minutos
+                for chat_id, pref in list(preferencias_ativas.items()):
                     if pref.get('radar_ativo', False):
                         texto_radar = compilar_radar(pref)
                         if texto_radar:
@@ -106,7 +106,7 @@ def motor_de_alertas():
                 ocorreu_mudanca = False
                 for chat_id in list(alertas_ativos.keys()):
                     alertas_do_usuario = alertas_ativos[chat_id]
-                    alertas_restantes = []
+                    alertas_para_remover = []
                     
                     for alerta in alertas_do_usuario:
                         moeda = alerta['moeda']
@@ -115,7 +115,6 @@ def motor_de_alertas():
                         
                         preco_atual = buscar_preco_ativo(moeda)
                         if not preco_atual:
-                            alertas_restantes.append(alerta)
                             continue
                             
                         if not direcao:
@@ -132,11 +131,14 @@ def motor_de_alertas():
                             try:
                                 bot.send_message(chat_id, texto, parse_mode="Markdown")
                                 ocorreu_mudanca = True
+                                alertas_para_remover.append(alerta)
                             except:
-                                alertas_restantes.append(alerta)
-                        else:
-                            alertas_restantes.append(alerta)
-                    alertas_ativos[chat_id] = alertas_restantes
+                                pass
+                                
+                    if ocorreu_mudanca:
+                        for disp in alertas_para_remover:
+                            if disp in alertas_ativos[chat_id]:
+                                alertas_ativos[chat_id].remove(disp)
                 if ocorreu_mudanca:
                     salvar_memoria(alertas_ativos)
         except Exception as e:
@@ -194,10 +196,8 @@ def criar_alerta(mensagem):
     chat_id = mensagem.chat.id
     bot.send_message(chat_id, "Validando preço e montando alerta... ")
     
-    preco_atual = buscar_preco_binance(moeda + "BRL")
-    if not preco_atual:
-        preco_atual = buscar_preco_awesome(moeda + "-BRL")
-        
+    preco_atual = buscar_preco_ativo(moeda)
+
     if not preco_atual:
         bot.send_message(chat_id, f"❌ Não localizamos a moeda '{moeda}' hoje. Verifique se a sigla está correta.")
         return
@@ -292,13 +292,8 @@ def busca_livre(mensagem):
     chat_id = mensagem.chat.id
     bot.send_message(chat_id, f"Buscando '{moeda}'...")
 
-    # Fallback: Binance -> AwesomeAPI
-    preco_atual = buscar_preco_binance(moeda + "BRL")
-    fonte = "Binance"
-    
-    if not preco_atual:
-        preco_atual = buscar_preco_awesome(moeda + "-BRL")
-        fonte = "AwesomeAPI"
+    preco_atual = buscar_preco_ativo(moeda)
+    fonte = "APIs Modulares"
     
     if preco_atual:
         texto = f"🔎 *Busca Livre ({fonte})*\nMoeda: {moeda}\nValor: R$ {preco_atual:.2f}"
@@ -403,8 +398,11 @@ def resposta_botoes(call):
     elif comando == "fiat":
         bot.send_message(chat_id, "Buscando moedas nacionais... ")
         try:
-            dados = requests.get("https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL,JPY-BRL", timeout=5).json()
-            texto = f"*Cotações Nacionais (Fiat)*\n\n💵 Dólar: R$ {dados['USDBRL']['bid']}\n💶 Euro: R$ {dados['EURBRL']['bid']}\n💷 Libra: R$ {dados['GBPBRL']['bid']}\n💴 JPY: R$ {dados['JPYBRL']['bid']}"
+            usd = buscar_preco_hgbrasil('USD') or 0.0
+            eur = buscar_preco_hgbrasil('EUR') or 0.0
+            gbp = buscar_preco_hgbrasil('GBP') or 0.0
+            jpy = buscar_preco_hgbrasil('JPY') or 0.0
+            texto = f"*Cotações Nacionais (Fiat)*\n\n💵 Dólar: R$ {usd:.2f}\n💶 Euro: R$ {eur:.2f}\n💷 Libra: R$ {gbp:.2f}\n💴 Iene: R$ {jpy:.4f}"
             bot.send_message(chat_id, texto, parse_mode='Markdown')
         except Exception as e:
             logger.error(f"Erro buscar Fiat: {e}")
@@ -413,9 +411,12 @@ def resposta_botoes(call):
         
     elif comando == "cripto":
         bot.send_message(chat_id, "Buscando principais criptos...")
-        try:
-            dados = requests.get("https://economia.awesomeapi.com.br/last/ETH-BRL,BTC-BRL,DOGE-BRL,LTC-BRL", timeout=5).json()
-            texto = f"🪙 *Principais Criptomoedas*\n\n♦️ Ethereum: R$ {dados['ETHBRL']['bid']}\n₿ Bitcoin: R$ {dados['BTCBRL']['bid']}\nŁ Litecoin: R$ {dados['LTCBRL']['bid']}\n🐕 Dogecoin: R$ {dados['DOGEBRL']['bid']}"
+        try:        
+            eth = buscar_preco_coingecko('ETH') or 0.0
+            btc = buscar_preco_coingecko('BTC') or 0.0
+            ltc = buscar_preco_coingecko('LTC') or 0.0
+            doge = buscar_preco_coingecko('DOGE') or 0.0
+            texto = f"🪙 *Principais Criptomoedas*\n\n♦️ Ethereum: R$ {eth:,.2f}\n₿ Bitcoin: R$ {btc:,.2f}\nŁ Litecoin: R$ {ltc:,.2f}\n🐕 Dogecoin: R$ {doge:,.4f}"
             bot.send_message(chat_id, texto, parse_mode='Markdown')
         except Exception as e:
             logger.error(f"Erro ao buscar Cripto: {e}")
@@ -427,7 +428,8 @@ def resposta_botoes(call):
         url = FONTES_NOTICIAS[chave]["url"]
         bot.send_message(chat_id, f"Buscando as últimas de {FONTES_NOTICIAS[chave]['nome']}... ⏳")
         try:
-            feed = feedparser.parse(url)
+            resposta = requests.get(url, timeout=5)
+            feed = feedparser.parse(resposta.text)
             if not feed.entries:
                 bot.send_message(chat_id, "⚠️ Fonte indisponível no momento.")
                 return

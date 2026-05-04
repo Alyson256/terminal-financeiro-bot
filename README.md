@@ -1,18 +1,36 @@
 # Terminal Financeiro — Bot Telegram
 
+[![PT-BR](https://img.shields.io/badge/Portugu%C3%AAs-PT--BR-green)](README.md)
+[![EN](https://img.shields.io/badge/English-EN-blue)](README_en.md)
+
 Bot Telegram modular para monitoramento financeiro em tempo real. Consulte cotações de moedas e criptomoedas, configure alertas de preço personalizados e automatize resumos matinais com feeds de notícias.
 
-![Version](https://img.shields.io/badge/version-2.2.1-blue)
+![Version](https://img.shields.io/badge/version-2.3.5-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## Recursos V(2.2.1)
+## 🧪 Como Testar (Beta Testing)
 
+O Terminal Financeiro (v2.3) está rodando na nuvem (Google Cloud) e aberto para testes da comunidade! O objetivo agora é estressar o sistema e testar o cache.
+
+1. **Acesse o Bot:**[Clique aqui para abrir no Telegram](https://web.telegram.org/a/#8639694375)
+2. **Inicie o Sistema:** Envie o comando `/start`.
+3. **Estresse a Máquina:**
+   - Teste os botões interativos de `/fiat` e `/cripto`.  
+   - Faça buscas livres com `/cotar BTC` ou digite moedas que não existem (ex: `/cotar BLA`) para testar o nosso tratamento de erros.
+   - Explore o hub interativo digitando `/automatico` e acople moedas no seu radar com `/automoeda`.
+4. **Encontrou um Bug?** Conseguiu quebrar o bot? Ele travou ou não respondeu? Por favor, abra uma **Issue** aqui no repositório com um print da tela ou me envie uma mensagem direta!
+  
+--
+
+## Recursos V(2.3.5)
+
+- **Cloud-Ready (Hotfixes de Estabilidade)** — Operações de I/O blindadas com `threading.Lock` e *parsers* de requisições isolados com limites de tempo (`timeouts`) para garantir tolerância à falhas em nuvem.
 - **Cotações em tempo real** — Moedas Fiat (USD, EUR, GBP, JPY) e criptomoedas via Binance e AwesomeAPI
 - **Busca livre** — Qualquer ativo pelo símbolo oficial com fallback automático entre APIs
-- **Sistema de alertas** — Notificação one-shot quando o preço atingir o alvo configurado
+- **Sistema de alertas** — Notificação one-shot sem perda de dados (proteção contra *Race Conditions*)
 - **Hub Automático** — Jornal matinal agendado e radar de mercado a cada 90 minutos
 - **Central de notícias** — Feeds RSS de G1, Livecoins, CriptoFácil e CoinTelegraph
 - **Manual dinâmico** — Comando `/explicar` com instruções detalhadas por funcionalidade
@@ -108,8 +126,8 @@ API.py      → Conectividade: requisições às APIs externas (Binance, Awesome
 
 | API | Uso | Autenticação |
 |-----|-----|-------------|
-| [Binance](https://api.binance.com) | Preços de criptomoedas | Pública |
-| [AwesomeAPI](https://economia.awesomeapi.com.br) | Preços de moedas fiat e cripto | Pública |
+| [CoinGecko](https://www.coingecko.com/en/api) | Preços de criptomoedas | Pública (Sujeito a Rate Limit) |
+| [HG Brasil](https://hgbrasil.com/) | Preços de moedas fiat | Requer Chave API (`HG_API_KEY`) |
 | Feeds RSS | Notícias financeiras | Pública |
 
 ---
@@ -141,4 +159,4 @@ Distribuído sob a [MIT License](LICENSE).
 
 ## Autor
 
-**Alyson** · [github.com/AlysonRN](https://github.com/AlysonRN)
+**Alyson** · [github.com/Alyson256](https://github.com/Alyson256)

@@ -13,7 +13,7 @@ Modular Telegram bot for real-time financial monitoring. Check fiat and crypto q
 
 ## 🧪 How to Test (Beta Testing)
 
-The Financial Terminal (v2.3) is currently deployed on Google Cloud and open for community testing! The goal is to stress test the system and our memory cache.
+The Financial Terminal (v2.3.5) is currently deployed on Google Cloud and open for community testing! The goal is to stress test the system and our memory cache.
 
 1. **Access the Bot:**[Click here to open in Telegram](https://web.telegram.org/a/#8639694375)
 2. **Boot the System:** Send the `/start` command.

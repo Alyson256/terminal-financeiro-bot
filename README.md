@@ -13,7 +13,7 @@ Bot Telegram modular para monitoramento financeiro em tempo real. Consulte cota�
 
 ## 🧪 Como Testar (Beta Testing)
 
-O Terminal Financeiro (v2.3) está rodando na nuvem (Google Cloud) e aberto para testes da comunidade! O objetivo agora é estressar o sistema e testar o cache.
+O Terminal Financeiro (v2.3.5) está rodando na nuvem (Google Cloud) e aberto para testes da comunidade! O objetivo agora é estressar o sistema e testar o cache.
 
 1. **Acesse o Bot:**[Clique aqui para abrir no Telegram](https://web.telegram.org/a/#8639694375)
 2. **Inicie o Sistema:** Envie o comando `/start`.

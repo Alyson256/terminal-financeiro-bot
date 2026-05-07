@@ -1,162 +1,164 @@
-# Terminal Financeiro — Bot Telegram
+# J.A.R.V.I.S-Lite — Data Orchestrator & Personal Assistant
 
-[![PT-BR](https://img.shields.io/badge/Portugu%C3%AAs-PT--BR-green)](README.md)
-[![EN](https://img.shields.io/badge/English-EN-blue)](README_en.md)
+[![EN](https://img.shields.io/badge/English-EN-blue)](README.md)
+[![PT-BR](https://img.shields.io/badge/Portugu%C3%AAs-PT--BR-green)](README_pt.md)
 
-Bot Telegram modular para monitoramento financeiro em tempo real. Consulte cotações de moedas e criptomoedas, configure alertas de preço personalizados e automatize resumos matinais com feeds de notícias.
+**J.A.R.V.I.S-Lite** (formerly Financial Terminal) is a modular Super App built in Python running via Telegram. It acts as a data orchestrator and personal assistant designed for real-time monitoring and structurally prepared for the upcoming integration of the **Google Gemini API**, which will elevate the project with natural language processing and global conversational flows.
 
-![Version](https://img.shields.io/badge/version-2.3.5-blue)
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-## 🧪 Como Testar (Beta Testing)
+## 🧪 How to Test (Beta Testing)
 
-O Terminal Financeiro (v2.3.5) está rodando na nuvem (Google Cloud) e aberto para testes da comunidade! O objetivo agora é estressar o sistema e testar o cache.
 
-1. **Acesse o Bot:**[Clique aqui para abrir no Telegram](https://web.telegram.org/a/#8639694375)
-2. **Inicie o Sistema:** Envie o comando `/start`.
-3. **Estresse a Máquina:**
-   - Teste os botões interativos de `/fiat` e `/cripto`.  
-   - Faça buscas livres com `/cotar BTC` ou digite moedas que não existem (ex: `/cotar BLA`) para testar o nosso tratamento de erros.
-   - Explore o hub interativo digitando `/automatico` e acople moedas no seu radar com `/automoeda`.
-4. **Encontrou um Bug?** Conseguiu quebrar o bot? Ele travou ou não respondeu? Por favor, abra uma **Issue** aqui no repositório com um print da tela ou me envie uma mensagem direta!
-  
---
+The core of J.A.R.V.I.S-Lite (v3.0.0) is currently under development. When it's ready, I'll apply the commit with the new orchestration flows!
 
-## Recursos V(2.3.5)
-
-- **Cloud-Ready (Hotfixes de Estabilidade)** — Operações de I/O blindadas com `threading.Lock` e *parsers* de requisições isolados com limites de tempo (`timeouts`) para garantir tolerância à falhas em nuvem.
-- **Cotações em tempo real** — Moedas Fiat (USD, EUR, GBP, JPY) e criptomoedas via Binance e AwesomeAPI
-- **Busca livre** — Qualquer ativo pelo símbolo oficial com fallback automático entre APIs
-- **Sistema de alertas** — Notificação one-shot sem perda de dados (proteção contra *Race Conditions*)
-- **Hub Automático** — Jornal matinal agendado e radar de mercado a cada 90 minutos
-- **Central de notícias** — Feeds RSS de G1, Livecoins, CriptoFácil e CoinTelegraph
-- **Manual dinâmico** — Comando `/explicar` com instruções detalhadas por funcionalidade
+1. **Access the Bot:**[Click here to open in Telegram](https://t.me/cotsson_bot)
+2. **Boot the System:** Send the `/start` command.
+3. **Stress Test It:**
+   - Try the interactive buttons for `/fiat` and `/cripto`.
+   - Run custom queries like `/cotar BTC` or try nonexistent coins (e.g., `/cotar BLA`) to test the error handling.
+   - Explore the interactive hub using `/automatico` and attach coins to your radar via `/automoeda`.
+4. **Found a Bug?** Did you break the bot? Did it crash or stop responding? Please open an **Issue** in this repository with a screenshot or send me a direct message!
 
 ---
 
-## Instalação
+## Features V(3.0.0)
 
-### Pré-requisitos
-- Python 3.10 ou superior
-- Um bot Telegram criado via [@BotFather](https://t.me/BotFather)
+- **[NEW] Orchestration Architecture** — Structural preparation to integrate the Google Gemini API as the brain of the data flow and interactive personal assistant.
+- **Cloud-Ready Financial Module** — I/O operations secured with `threading.Lock` and isolated request parsers with `timeouts`.
+- **Network Intelligence (Anti-Geoblock)** — Real-time quotes via CoinGecko and HG Brasil mitigated by smart RAM caching via `cachetools`.
+- **Free Search** — Any asset by its official symbol with automatic API fallbacks.
+- **Alert System** — One-shot notifications with zero data loss (secured against *Race Conditions*).
+- **Automated Hub** — Scheduled morning news briefs and market radar every 90 minutes.
+- **News Center** — RSS feeds from major Brazilian financial news portals (G1, Livecoins, CriptoFácil, and CoinTelegraph).
+- **Dynamic Manual** — `/explicar` command with detailed instructions per feature.
 
-### 1. Clonar o repositório
+---
+
+## Installation
+
+### Prerequisites
+- Python 3.10 or higher
+- A Telegram bot created via [@BotFather](https://t.me/BotFather)
+
+### 1. Clone the repository
 ```bash
 git clone https://github.com/AlysonRN/terminal-financeiro.git
 cd terminal-financeiro
 ```
 
-### 2. Criar o ambiente virtual e instalar dependências
+### 2. Create a virtual environment and install dependencies
 ```bash
 python -m venv .venv
-.venv\Scripts\activate      # Windows
-# ou
+.\.venv\Scripts\activate      # Windows
+# or
 source .venv/bin/activate   # Linux/macOS
 
 pip install -r requirements.txt
 ```
 
-### 3. Configurar variáveis de ambiente
-Crie um arquivo `.env` na raiz do projeto:
+### 3. Configure environment variables
+Create a `.env` file in the project root:
 ```env
-CHAVE_API=seu_token_do_telegram_aqui
+CHAVE_API=your_telegram_bot_token_here
 ```
 
-### 4. Executar
+### 4. Run
 ```bash
-python main.py
+.\.venv\Scripts\python main.py
 ```
 
 ---
 
-## Comandos
+## Commands
 
-| Comando | Descrição | Exemplo |
+| Command | Description | Example |
 |---------|-----------|---------|
-| `/start` | Menu principal interativo | `/start` |
-| `/cotar [MOEDA]` | Cotação de qualquer ativo (cripto ou fiat) | `/cotar ETH` |
-| `/fiat` | Cotações das principais moedas nacionais | `/fiat` |
-| `/cripto` | Cotações das principais criptomoedas | `/cripto` |
-| `/automatico` | Painel do Hub Automático (Jornal + Radar) | `/automatico` |
-| `/automoeda [SIGLA]` | Associa uma moeda ao seu radar/jornal | `/automoeda BTC` |
-| `/noticias` | Menu de fontes de notícias financeiras | `/noticias` |
-| `/alerta [MOEDA] [VALOR]` | Cria alerta de preço | `/alerta BTC 350000` |
-| `/alertas` | Lista alertas ativos | `/alertas` |
-| `/excluir [MOEDA]` | Remove um alerta | `/excluir BTC` |
-| `/explicar [COMANDO]` | Explicação detalhada de um comando | `/explicar automatico` |
-| `/ajuda` | Lista todos os comandos | `/ajuda` |
-| `/sobre` | Informações da versão | `/sobre` |
+| `/start` | Interactive main menu | `/start` |
+| `/cotar [COIN]` | Quote for any asset (crypto or fiat) | `/cotar ETH` |
+| `/fiat` | Top national fiat currency quotes | `/fiat` |
+| `/cripto` | Top cryptocurrency quotes | `/cripto` |
+| `/automatico` | Automated Hub Dashboard (News + Radar) | `/automatico` |
+| `/automoeda [SYMBOL]` | Binds a coin to your radar/news | `/automoeda BTC` |
+| `/noticias` | Financial news sources menu | `/noticias` |
+| `/alerta [COIN] [VALUE]` | Creates a price alert | `/alerta BTC 350000` |
+| `/alertas` | Lists active alerts | `/alertas` |
+| `/excluir [COIN]` | Removes an alert | `/excluir BTC` |
+| `/explicar [CMD]` | Detailed explanation of a command | `/explicar automatico` |
+| `/ajuda` | Lists all commands | `/ajuda` |
+| `/sobre` | Version information | `/sobre` |
 
 ---
 
-## Arquitetura
+## Architecture
 
-O projeto é dividido em três camadas com responsabilidades bem definidas:
+The project is divided into three layers with well-defined responsibilities:
 
 ```
-main.py     → Roteamento: handlers de comandos, callbacks e entrypoint
+main.py     → Routing: command handlers, callbacks, and entrypoint
   ↓
-util.py     → Lógica: persistência JSON, formatadores e compiladores de texto
+util.py     → Logic: JSON persistence, formatters, and text compilers
   ↓
-API.py      → Conectividade: requisições às APIs externas (Binance, AwesomeAPI)
+API.py      → Connectivity: external API requests (Binance, AwesomeAPI)
 ```
 
-### Estrutura de arquivos
+### File Structure
 ```
 .
-├── main.py                    # Entrypoint e handlers do bot
-├── API.py                     # Funções de busca de preço
-├── util.py                    # Utilitários, persistência e compiladores
-├── requirements.txt           # Dependências do projeto
-├── .env                       # Token do bot (não commitar)
+├── main.py                    # Entrypoint and bot handlers
+├── API.py                     # Price fetch functions
+├── util.py                    # Utilities, persistence, and compilers
+├── requirements.txt           # Project dependencies
+├── .env                       # Bot token (do not commit)
 ├── .gitignore
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 └── LICENSE
 ```
 
-> Os arquivos `memoria_alertas.json`, `preferencias_usuarios.json`, `bot.lock` e `terminal_financeiro.log` são gerados automaticamente em tempo de execução e não fazem parte do repositório.
+> The files `memoria_alertas.json`, `preferencias_usuarios.json`, `bot.lock`, and `terminal_financeiro.log` are automatically generated at runtime and are not tracked by the repository.
 
 ---
 
-## APIs Utilizadas
+## Used APIs
 
-| API | Uso | Autenticação |
-|-----|-----|-------------|
-| [CoinGecko](https://www.coingecko.com/en/api) | Preços de criptomoedas | Pública (Sujeito a Rate Limit) |
-| [HG Brasil](https://hgbrasil.com/) | Preços de moedas fiat | Requer Chave API (`HG_API_KEY`) |
-| Feeds RSS | Notícias financeiras | Pública |
-
----
-
-## Hub Automático
-
-O Hub Automático oferece duas assinaturas independentes por usuário:
-
-- **Jornal Matinal** — Envia automaticamente no horário configurado (06h às 21h) um resumo com as 3 últimas manchetes da fonte escolhida e os preços das moedas favoritas.
-- **Radar de Mercado** — Envia os preços das moedas favoritas a cada 90 minutos, enquanto ativado.
-
-Use `/automatico` para ligar/desligar cada módulo e `/automoeda [SIGLA]` para vincular ativos ao seu painel.
+| API | Use Case | Authentication |
+|-----|----------|----------------|
+| [CoinGecko](https://www.coingecko.com/en/api) | Crypto prices | Public (Rate-limited) |
+| [HG Brasil](https://hgbrasil.com/) | Fiat prices | Requires API Key (`HG_API_KEY`) |
+| RSS Feeds | Financial news | Public |
 
 ---
 
-## Segurança
+## Automated Hub
 
-- Nunca commite o arquivo `.env` — ele já está no `.gitignore`
-- Os dados de alertas e preferências são armazenados localmente, nunca transmitidos a terceiros
-- O arquivo `bot.lock` previne múltiplas instâncias simultâneas do bot
+The Automated Hub offers two independent subscriptions per user:
 
----
+- **Morning News (Jornal)** — Sends a summary with the 3 latest headlines from the chosen source and favorite coin prices automatically at the configured time (06:00 to 21:00).
+- **Market Radar (Radar)** — Sends favorite coin prices every 90 minutes while active.
 
-## Licença
-
-Distribuído sob a [MIT License](LICENSE).
+Use `/automatico` to toggle each module and `/automoeda [SYMBOL]` to bind assets to your dashboard.
 
 ---
 
-## Autor
+## Security
+
+- Never commit the `.env` file — it is already in `.gitignore`.
+- Alert and preference data are stored locally and never transmitted to third parties.
+- The `bot.lock` file prevents multiple simultaneous instances of the bot.
+
+---
+
+## License
+
+Distributed under the [MIT License](LICENSE).
+
+---
+
+## Author
 
 **Alyson** · [github.com/Alyson256](https://github.com/Alyson256)

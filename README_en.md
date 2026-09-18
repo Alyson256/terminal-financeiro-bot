@@ -3,6 +3,8 @@
 [![PT-BR](https://img.shields.io/badge/Portugu%C3%AAs-PT--BR-green)](README.md)
 [![EN](https://img.shields.io/badge/English-EN-blue)](README_en.md)
 
+> Attention: this bot will be offline for a while, i will update more features...
+
 Modular Telegram bot for real-time financial monitoring. Check fiat and crypto quotes, set custom price alerts, and automate morning briefs with RSS news feeds.
 
 ![Version](https://img.shields.io/badge/version-2.3.5-blue)

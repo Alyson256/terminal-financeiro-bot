@@ -2,6 +2,8 @@
 
 [![PT-BR](https://img.shields.io/badge/Portugu%C3%AAs-PT--BR-green)](README.md)
 [![EN](https://img.shields.io/badge/English-EN-blue)](README_en.md)
+> Atenção: por enquanto, esse bot estará desativado, tenho ideias de mais implementações no futuro...
+
 
 Bot Telegram modular para monitoramento financeiro em tempo real. Consulte cotações de moedas e criptomoedas, configure alertas de preço personalizados e automatize resumos matinais com feeds de notícias.
 
